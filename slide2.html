@@ -135,9 +135,11 @@ setInterval(function() {
           statusCode: {
         200: function() {
       console.log( "online" +statusCode);
+          location.reload(1);
     },
         304: function() {
       console.log( "online" +statusCode);
+          location.reload(1);
     },
         404: function() {
       console.log( "page not found" +statusCode);
