@@ -132,14 +132,19 @@ setInterval(function() {
     $.ajax({ 
         url  : "/img1.jpg", /* or other resource */
         type : "HEAD",
-    success: function(){
-        console.log("online");
+          statusCode: {
+        200: function() {
+      console.log( "online" );
     },
-    error: function(){
-        console.log("offline");
+        304: function() {
+      console.log( "online" );
+    },
+        404: function() {
+      console.log( "page not found" );
+    }
     }
     });
-}, 3000); /* 120000 ~> 2 minutes */
+}, 2000); /* 120000 ~> 2 minutes */
 </script>
 
 </body>
