@@ -134,15 +134,15 @@ setInterval(function() {
         type : "HEAD",
           statusCode: {
         200: function() {
-      console.log( "online" +statusCode);
+      console.log( "online200");
           location.reload(1);
     },
         304: function() {
-      console.log( "online" +statusCode);
+      console.log( "online304");
           location.reload(1);
     },
         404: function() {
-      console.log( "page not found" +statusCode);
+      console.log( "page not found");
     }
     }
     });
