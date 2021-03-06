@@ -126,7 +126,9 @@ function showSlides() {
 }
   
 setTimeout(function(){
-  location.reload(1);
+    if (navigator.onLine) {
+        location.reload(1);
+   }
 }, 8000);
 </script>
 
