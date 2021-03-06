@@ -129,17 +129,17 @@ function showSlides() {
   
 setInterval(function() {
 
-$.get({
-  url: "https://akryeem.github.io/slide.html",
-  success: function(){
-    console.log("online");
-  },
-  error: function(){
-    console.log("offline");
-  },
-  dataType: 'text'
-});
-}, 8000); /* 120000 ~> 2 minutes */
+    $.ajax({ 
+        url  : "/img1.jpg", /* or other resource */
+        type : "HEAD",
+    success: function(){
+        console.log("online");
+    },
+    error: function(){
+        console.log("offline");
+    }
+    });
+}, 3000); /* 120000 ~> 2 minutes */
 </script>
 
 </body>
