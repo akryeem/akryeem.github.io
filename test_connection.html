@@ -10,7 +10,7 @@
       Click Me
   </button>
   
-    <p id="demo"></p>
+    <p id="demo">Online</p>
   
     <script>
       function isOnline2() {
@@ -23,16 +23,19 @@
           statusCode: {
         200: function() {
            alert("Succesfully connected!");
+            document.getElementById("p1").innerHTML = "Succesfully connected!";
       console.log( "online200");
           location.reload(1);
     },
         304: function() {
+            document.getElementById("p1").innerHTML = "online304!";
                      alert("online304!");
 
       console.log( "online304");
           location.reload(1);
     },
         404: function() {
+            document.getElementById("p1").innerHTML = "Sorry, we currently do not have Internet access!";
           alert("Sorry, we currently do not have Internet access.");
       console.log( "page not found");
     }
