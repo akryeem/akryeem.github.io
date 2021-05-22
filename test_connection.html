@@ -23,19 +23,19 @@
           statusCode: {
         200: function() {
            alert("Succesfully connected!");
-            document.getElementById("p1").innerHTML = "Succesfully connected!";
+            document.getElementById("demo").innerHTML = "Succesfully connected!";
       console.log( "online200");
           location.reload(1);
     },
         304: function() {
-            document.getElementById("p1").innerHTML = "online304!";
+            document.getElementById("demo").innerHTML = "online304!";
                      alert("online304!");
 
       console.log( "online304");
           location.reload(1);
     },
         404: function() {
-            document.getElementById("p1").innerHTML = "Sorry, we currently do not have Internet access!";
+            document.getElementById("demo").innerHTML = "Sorry, we currently do not have Internet access!";
           alert("Sorry, we currently do not have Internet access.");
       console.log( "page not found");
     }
