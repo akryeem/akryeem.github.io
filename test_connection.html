@@ -17,7 +17,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
         
-        
+        var counter = 1;
         
        function isOnline2() {
   
@@ -29,20 +29,20 @@ function sleep(ms) {
           statusCode: {
         200: function() {
            alert("Succesfully connected!");
-            document.getElementById("demo").innerHTML = "Succesfully connected!";
+            document.getElementById("demo").innerHTML = "Succesfully connected! " + counter;
       console.log( "online200");
          //   await new Promise(r => setTimeout(r, 5000));
          // location.reload(1);
     },
         304: function() {
-            document.getElementById("demo").innerHTML = "online304!";
+            document.getElementById("demo").innerHTML = "online304! " + counter;
                      alert("online304!");
 
       console.log( "online304");
-          location.reload(1);
+          //location.reload(1);
     },
         404: function() {
-            document.getElementById("demo").innerHTML = "Sorry, we currently do not have Internet access!";
+            document.getElementById("demo").innerHTML = "Sorry, we currently do not have Internet access! " + counter;
           alert("Sorry, we currently do not have Internet access.");
       console.log( "page not found");
     }
