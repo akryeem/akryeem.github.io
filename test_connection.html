@@ -6,14 +6,7 @@
     <p>Click the button to check 
       if the browser is online.</p>
   
-    <button onclick="isOnline(
-    function(){
-        alert("Sorry, we currently do not have Internet access.");
-    },
-    function(){
-        alert("Succesfully connected!");
-    }
-)">
+    <button onclick="isOnline1()">
       Click Me
   </button>
   
@@ -53,6 +46,14 @@ isOnline(
                 document.getElementById(
                   "demo").innerHTML = "Offline";
             }
+          isOnline(
+    function(){
+        alert("Sorry, we currently do not have Internet access.");
+    },
+    function(){
+        alert("Succesfully connected!");
+    }
+);
         }
     </script>
   
