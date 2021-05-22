@@ -13,7 +13,31 @@
     <p id="demo"></p>
   
     <script>
-        function isOnline() {
+      function isOnline(no,yes){
+    var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHttp');
+    xhr.onload = function(){
+        if(yes instanceof Function){
+            yes();
+        }
+    }
+    xhr.onerror = function(){
+        if(no instanceof Function){
+            no();
+        }
+    }
+    xhr.open("GET","anypage.php",true);
+    xhr.send();
+}
+
+isOnline(
+    function(){
+        alert("Sorry, we currently do not have Internet access.");
+    },
+    function(){
+        alert("Succesfully connected!");
+    }
+);
+        function isOnline1() {
   
             if (navigator.onLine) {
                 document.getElementById(
