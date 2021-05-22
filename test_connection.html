@@ -6,7 +6,14 @@
     <p>Click the button to check 
       if the browser is online.</p>
   
-    <button onclick="isOnline()">
+    <button onclick="isOnline(
+    function(){
+        alert("Sorry, we currently do not have Internet access.");
+    },
+    function(){
+        alert("Succesfully connected!");
+    }
+)">
       Click Me
   </button>
   
