@@ -6,13 +6,44 @@
     <p>Click the button to check 
       if the browser is online.</p>
   
-    <button onclick="isOnline1()">
+    <button onclick="isOnline2()">
       Click Me
   </button>
   
     <p id="demo"></p>
   
     <script>
+      function isOnline2() {
+
+    $.ajax({ 
+        url  : "/img1.jpg", /* or other resource */
+        type : "HEAD",
+              cache: false,
+
+          statusCode: {
+        200: function() {
+           alert("Succesfully connected!");
+      console.log( "online200");
+          location.reload(1);
+    },
+        304: function() {
+                     alert("online304!");
+
+      console.log( "online304");
+          location.reload(1);
+    },
+        404: function() {
+          alert("Sorry, we currently do not have Internet access.");
+      console.log( "page not found");
+    }
+    }
+    });
+      
+      
+      
+      
+      
+      
       function isOnline(no,yes){
     var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHttp');
     xhr.onload = function(){
