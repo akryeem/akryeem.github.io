@@ -27,12 +27,12 @@ function sleep(ms) {
               cache: false,
 
           statusCode: {
-        200: async function() {
+        200: function() {
            alert("Succesfully connected!");
             document.getElementById("demo").innerHTML = "Succesfully connected!";
       console.log( "online200");
-            await new Promise(r => setTimeout(r, 5000));
-          location.reload(1);
+         //   await new Promise(r => setTimeout(r, 5000));
+         // location.reload(1);
     },
         304: function() {
             document.getElementById("demo").innerHTML = "online304!";
