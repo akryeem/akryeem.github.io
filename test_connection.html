@@ -27,7 +27,7 @@ function sleep(ms) {
               cache: false,
 
           statusCode: {
-        200: function() {
+        200: async function() {
            alert("Succesfully connected!");
             document.getElementById("demo").innerHTML = "Succesfully connected!";
       console.log( "online200");
