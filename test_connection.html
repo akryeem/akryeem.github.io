@@ -13,18 +13,25 @@
     <p id="demo">Online</p>
   
     <script>
-      function isOnline2() {
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+        
+        
+        
+       function isOnline2() {
+  
     $.ajax({ 
         url  : "/test_connection.html", /* or other resource */
         type : "HEAD",
               cache: false,
 
           statusCode: {
-        200: function() {
+        200: async function() {
            alert("Succesfully connected!");
             document.getElementById("demo").innerHTML = "Succesfully connected!";
       console.log( "online200");
+            await sleep(5000);
           location.reload(1);
     },
         304: function() {
