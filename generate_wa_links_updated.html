@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="content-type" content="text/html; charset=UTF8">
+    <style>
+        body {
+            direction: rtl;
+            text-align: center;
+            padding-right: 5%;
+        }
+
+        h1 {
+            color: #333333;
+            background: #FFFFFF;
+            text-shadow: 2px 2px 0px #FFFFFF, 5px 4px 0px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #dddddd;
+        }
+
+        p {
+            font-family: STV, Charcoal, sans-serif;
+            font-size: 25px;
+            color: #0070FF;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .create_btn {
+            color: #fff !important;
+            text-transform: uppercase;
+            text-decoration: none;
+            background: #60a3bc;
+            padding: 10px;
+            border-radius: 50px;
+            display: inline-block;
+            border: none;
+            transition: all 0.4s ease 0s;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .create_btn:hover {
+            text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
+            box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
+            transition: all 0.4s ease 0s;
+        }
+
+        input[type="text"], textarea {
+            width: 80%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #dddddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>مولد روابط رسائل واتساب السريعة</h1>
+
+<form id="messageForm">
+    <label for="message">الرسالة:</label><br>
+    <textarea id="message" name="message" placeholder="أدخل رسالتك..." rows="4" cols="50"></textarea><br><br>
+
+    <label for="phoneNumbers">أرقام الهواتف:</label><br>
+    <textarea id="phoneNumbers" name="phoneNumbers" placeholder="أدخل أرقام الهواتف" rows="4" cols="30"></textarea><br><br>
+
+    <label for="names">الأسماء:</label><br>
+    <textarea id="names" name="names" placeholder="أدخل الأسماء" rows="4" cols="30"></textarea><br><br>
+
+    <label for="teacherName">اسم المعلم:</label><br>
+    <input type="text" id="teacherName" name="teacherName"><br><br>
+
+    <label for="teacherNumber">رقم المعلم:</label><br>
+    <input type="text" id="teacherNumber" name="teacherNumber"><br><br>
+
+    <label for="schoolName">اسم المدرسة:</label><br>
+    <input type="text" id="schoolName" name="schoolName"><br><br>
+
+    <button type="button" class="create_btn" onclick="generateLinks()">إنشاء روابط واتساب</button>
+    <button type="button" class="create_btn" onclick="copyLinks()">نسخ الروابط</button>
+    <input style="font-size: 18px;" type="button" class="create_btn" onclick="window.location.href='index.html'" value="عودة للصفحة الرئيسية" />
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>الرقم</th>
+            <th>الرابط</th>
+            <th>رقم الهاتف</th>
+            <th>إجراء</th>
+        </tr>
+    </thead>
+    <tbody id="result"></tbody>
+</table>
+
+<script>
+function generateLinks() {
+    var message = document.getElementById('message').value.trim();
+    var phoneNumbers = document.getElementById('phoneNumbers').value.trim().split('\n');
+    var names = document.getElementById('names').value.trim().split('\n');
+    var teacherName = document.getElementById('teacherName').value.trim();
+    var schoolName = document.getElementById('schoolName').value.trim();
+    var teacherNumber = document.getElementById('teacherNumber').value.trim();
+    var resultBody = document.getElementById('result');
+    resultBody.innerHTML = ''; // Clear previous results
+
+    phoneNumbers.forEach(function(number, index) {
+        var name = names[index] ? names[index].trim() : '';
+        var personalizedMessage = message
+            .replace('{name}', name)
+            .replace('{teacher}', teacherName)
+            .replace('{school}', schoolName)
+            .replace('{teacherNumber}', teacherNumber);
+
+        var encodedMessage = personalizedMessage.replace(/[^\u0600-\u06FF ]/g, function(match) {
+            return encodeURIComponent(match);
+        }).replace(/\s/g, '+');
+
+        if (personalizedMessage.endsWith('*')) {
+            encodedMessage += '%2A';
+        }
+
+        encodedMessage = encodedMessage.replace(/%0A/g, '%0D%0A');
+        var phone_number = encodeURIComponent(number.trim());
+        var whatsappLink = 'https://wa.me/972' + phone_number + '?text=' + encodedMessage;
+
+        var row = resultBody.insertRow();
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+
+        cell1.innerHTML = '<span data-ignore-copy>' + (index + 1) + '</span>';
+        cell2.textContent = whatsappLink;
+
+        var link = document.createElement('a');
+        link.href = whatsappLink;
+        link.textContent = phone_number;
+        cell3.appendChild(link);
+
+        var openBtn = document.createElement('button');
+        openBtn.textContent = 'فتح الرابط';
+        openBtn.className = 'create_btn';
+        openBtn.onclick = function () {
+            window.open(whatsappLink, '_blank');
+            row.style.backgroundColor = '#d4edda'; // Light green
+            setTimeout(() => {
+                row.parentNode.appendChild(row); // move to bottom
+            }, 100);
+        };
+        cell4.appendChild(openBtn);
+    });
+}
+
+function copyLinks() {
+    var table = document.querySelector('table');
+    var rows = table.getElementsByTagName('tr');
+    var tempInput = document.createElement('textarea');
+    var copyText = '';
+
+    for (var i = 0; i < rows.length; i++) {
+        var cells = rows[i].getElementsByTagName('td');
+        for (var j = 0; j < cells.length; j++) {
+            var cell = cells[j];
+            if (!cell.querySelector('[data-ignore-copy]')) {
+                if (cell.querySelector('a')) continue;
+                copyText += cell.textContent.trim() + '\t';
+            }
+        }
+        copyText += '\n';
+    }
+
+    tempInput.value = copyText;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    navigator.clipboard.writeText(tempInput.value);
+    document.body.removeChild(tempInput);
+    alert('تم نسخ الروابط إلى الحافظة');
+}
+</script>
+
+</body>
+</html>
