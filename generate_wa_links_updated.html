@@ -1,108 +1,92 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ar">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta http-equiv="content-type" content="text/html; charset=UTF8">
+    <meta charset="UTF-8">
+    <title>مولد روابط واتساب</title>
     <style>
         body {
             direction: rtl;
             text-align: center;
-            padding-right: 5%;
+            padding: 20px;
+            font-family: sans-serif;
         }
 
         h1 {
-            color: #333333;
-            background: #FFFFFF;
-            text-shadow: 2px 2px 0px #FFFFFF, 5px 4px 0px rgba(0, 0, 0, 0.15);
-            text-align: center;
+            color: #333;
         }
 
         table {
-            margin: 0 auto;
+            margin: 20px auto;
             border-collapse: collapse;
+            width: 90%;
         }
 
         th, td {
             padding: 10px;
-            border: 1px solid #dddddd;
+            border: 1px solid #ccc;
         }
 
-        p {
-            font-family: STV, Charcoal, sans-serif;
-            font-size: 25px;
-            color: #0070FF;
-            font-weight: 700;
-            margin: 0;
+        textarea, input[type="text"] {
+            width: 80%;
+            padding: 8px;
+            font-size: 16px;
+            margin: 5px 0 15px;
         }
 
         .create_btn {
-            color: #fff !important;
-            text-transform: uppercase;
-            text-decoration: none;
-            background: #60a3bc;
-            padding: 10px;
-            border-radius: 50px;
-            display: inline-block;
+            background-color: #60a3bc;
+            color: white;
             border: none;
-            transition: all 0.4s ease 0s;
-            font-size: 18px;
+            border-radius: 30px;
+            padding: 10px 15px;
+            font-size: 16px;
             cursor: pointer;
+            margin: 5px;
         }
 
         .create_btn:hover {
-            text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
-            box-shadow: 0px 5px 40px -10px rgba(0, 0, 0, 0.57);
-            transition: all 0.4s ease 0s;
+            background-color: #3c7b98;
         }
 
-        input[type="text"], textarea {
-            width: 80%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            border: 1px solid #dddddd;
-            border-radius: 5px;
-            font-size: 16px;
+        .highlighted {
+            background-color: #d4edda !important;
         }
     </style>
 </head>
-
 <body>
 
-<h1>مولد روابط رسائل واتساب السريعة</h1>
+<h1>مولد روابط رسائل واتساب</h1>
 
-<form id="messageForm">
-    <label for="message">الرسالة:</label><br>
-    <textarea id="message" name="message" placeholder="أدخل رسالتك..." rows="4" cols="50"></textarea><br><br>
+<form>
+    <label>الرسالة:</label><br>
+    <textarea id="message" rows="3" placeholder="اكتب الرسالة مع {name}, {teacher}, {school}, {teacherNumber}"></textarea><br>
 
-    <label for="phoneNumbers">أرقام الهواتف:</label><br>
-    <textarea id="phoneNumbers" name="phoneNumbers" placeholder="أدخل أرقام الهواتف" rows="4" cols="30"></textarea><br><br>
+    <label>الأسماء (كل اسم في سطر):</label><br>
+    <textarea id="names" rows="3"></textarea><br>
 
-    <label for="names">الأسماء:</label><br>
-    <textarea id="names" name="names" placeholder="أدخل الأسماء" rows="4" cols="30"></textarea><br><br>
+    <label>أرقام الهواتف (كل رقم في سطر):</label><br>
+    <textarea id="phones" rows="3"></textarea><br>
 
-    <label for="teacherName">اسم المعلم:</label><br>
-    <input type="text" id="teacherName" name="teacherName"><br><br>
+    <label>اسم المعلم:</label><br>
+    <input type="text" id="teacher"><br>
 
-    <label for="teacherNumber">رقم المعلم:</label><br>
-    <input type="text" id="teacherNumber" name="teacherNumber"><br><br>
+    <label>رقم المعلم:</label><br>
+    <input type="text" id="teacherNumber"><br>
 
-    <label for="schoolName">اسم المدرسة:</label><br>
-    <input type="text" id="schoolName" name="schoolName"><br><br>
+    <label>اسم المدرسة:</label><br>
+    <input type="text" id="school"><br>
 
-    <button type="button" class="create_btn" onclick="generateLinks()">إنشاء روابط واتساب</button>
+    <button type="button" class="create_btn" onclick="generateLinks()">إنشاء الروابط</button>
     <button type="button" class="create_btn" onclick="copyLinks()">نسخ الروابط</button>
-    <input style="font-size: 18px;" type="button" class="create_btn" onclick="window.location.href='index.html'" value="عودة للصفحة الرئيسية" />
 </form>
 
 <table>
     <thead>
         <tr>
-            <th>الرقم</th>
+            <th>#</th>
             <th>الرابط</th>
-            <th>رقم الهاتف</th>
-            <th>إجراء</th>
+            <th>الهاتف</th>
+            <th>فتح</th>
         </tr>
     </thead>
     <tbody id="result"></tbody>
@@ -110,87 +94,66 @@
 
 <script>
 function generateLinks() {
-    var message = document.getElementById('message').value.trim();
-    var phoneNumbers = document.getElementById('phoneNumbers').value.trim().split('\n');
-    var names = document.getElementById('names').value.trim().split('\n');
-    var teacherName = document.getElementById('teacherName').value.trim();
-    var schoolName = document.getElementById('schoolName').value.trim();
-    var teacherNumber = document.getElementById('teacherNumber').value.trim();
-    var resultBody = document.getElementById('result');
-    resultBody.innerHTML = ''; // Clear previous results
+    const msgTemplate = document.getElementById('message').value.trim();
+    const names = document.getElementById('names').value.trim().split('\n');
+    const phones = document.getElementById('phones').value.trim().split('\n');
+    const teacher = document.getElementById('teacher').value.trim();
+    const school = document.getElementById('school').value.trim();
+    const teacherNumber = document.getElementById('teacherNumber').value.trim();
+    const tbody = document.getElementById('result');
 
-    phoneNumbers.forEach(function(number, index) {
-        var name = names[index] ? names[index].trim() : '';
-        var personalizedMessage = message
-            .replace('{name}', name)
-            .replace('{teacher}', teacherName)
-            .replace('{school}', schoolName)
-            .replace('{teacherNumber}', teacherNumber);
+    tbody.innerHTML = '';
 
-        var encodedMessage = personalizedMessage.replace(/[^\u0600-\u06FF ]/g, function(match) {
-            return encodeURIComponent(match);
-        }).replace(/\s/g, '+');
+    phones.forEach((num, i) => {
+        const name = names[i] || '';
+        let msg = msgTemplate.replace('{name}', name)
+                             .replace('{teacher}', teacher)
+                             .replace('{school}', school)
+                             .replace('{teacherNumber}', teacherNumber);
 
-        if (personalizedMessage.endsWith('*')) {
-            encodedMessage += '%2A';
-        }
+        const fullNum = num.trim().replace(/^0/, '');
+        const encodedMsg = encodeURIComponent(msg);
+        const waLink = `https://wa.me/972${fullNum}?text=${encodedMsg}`;
 
-        encodedMessage = encodedMessage.replace(/%0A/g, '%0D%0A');
-        var phone_number = encodeURIComponent(number.trim());
-        var whatsappLink = 'https://wa.me/972' + phone_number + '?text=' + encodedMessage;
+        const row = tbody.insertRow();
+        row.insertCell(0).textContent = i + 1;
+        row.insertCell(1).textContent = waLink;
 
-        var row = resultBody.insertRow();
-        var cell1 = row.insertCell(0);
-        var cell2 = row.insertCell(1);
-        var cell3 = row.insertCell(2);
-        var cell4 = row.insertCell(3);
+        const phoneCell = row.insertCell(2);
+        const a = document.createElement('a');
+        a.href = waLink;
+        a.textContent = `972${fullNum}`;
+        phoneCell.appendChild(a);
 
-        cell1.innerHTML = '<span data-ignore-copy>' + (index + 1) + '</span>';
-        cell2.textContent = whatsappLink;
-
-        var link = document.createElement('a');
-        link.href = whatsappLink;
-        link.textContent = phone_number;
-        cell3.appendChild(link);
-
-        var openBtn = document.createElement('button');
-        openBtn.textContent = 'فتح الرابط';
+        const btnCell = row.insertCell(3);
+        const openBtn = document.createElement('button');
+        openBtn.textContent = 'فتح';
         openBtn.className = 'create_btn';
-        openBtn.onclick = function () {
-            window.open(whatsappLink, '_blank');
-            row.style.backgroundColor = '#d4edda'; // Light green
+        openBtn.onclick = () => {
+            window.open(waLink, '_blank');
+            row.classList.add('highlighted');
             setTimeout(() => {
-                row.parentNode.appendChild(row); // move to bottom
-            }, 100);
+                row.parentNode.appendChild(row);
+            }, 150);
         };
-        cell4.appendChild(openBtn);
+        btnCell.appendChild(openBtn);
     });
 }
 
 function copyLinks() {
-    var table = document.querySelector('table');
-    var rows = table.getElementsByTagName('tr');
-    var tempInput = document.createElement('textarea');
-    var copyText = '';
-
-    for (var i = 0; i < rows.length; i++) {
-        var cells = rows[i].getElementsByTagName('td');
-        for (var j = 0; j < cells.length; j++) {
-            var cell = cells[j];
-            if (!cell.querySelector('[data-ignore-copy]')) {
-                if (cell.querySelector('a')) continue;
-                copyText += cell.textContent.trim() + '\t';
-            }
-        }
-        copyText += '\n';
-    }
-
-    tempInput.value = copyText;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    navigator.clipboard.writeText(tempInput.value);
-    document.body.removeChild(tempInput);
-    alert('تم نسخ الروابط إلى الحافظة');
+    let all = '';
+    const rows = document.querySelectorAll('#result tr');
+    rows.forEach(row => {
+        const link = row.cells[1].textContent.trim();
+        all += link + '\n';
+    });
+    const temp = document.createElement('textarea');
+    temp.value = all;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand('copy');
+    document.body.removeChild(temp);
+    alert('تم نسخ الروابط');
 }
 </script>
 
