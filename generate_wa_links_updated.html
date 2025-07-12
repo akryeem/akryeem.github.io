@@ -1,159 +1,212 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <title>مولد روابط واتساب</title>
-    <style>
-        body {
-            direction: rtl;
-            text-align: center;
-            padding: 20px;
-            font-family: sans-serif;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        table {
-            margin: 20px auto;
-            border-collapse: collapse;
-            width: 90%;
-        }
-
-        th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-        }
-
-        textarea, input[type="text"] {
-            width: 80%;
-            padding: 8px;
-            font-size: 16px;
-            margin: 5px 0 15px;
-        }
-
-        .create_btn {
-            background-color: #60a3bc;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        .create_btn:hover {
-            background-color: #3c7b98;
-        }
-
-        .highlighted {
-            background-color: #d4edda !important;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>مولد واتساب - CSV + إرسال الكل</title>
+  <style>
+    body {
+      direction: rtl;
+      text-align: center;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+    h1 {
+      color: #333;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 95%;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      vertical-align: middle;
+    }
+    textarea, input[type="text"], input[type="file"] {
+      width: 80%;
+      padding: 8px;
+      font-size: 16px;
+      margin: 5px 0 15px;
+    }
+    .create_btn {
+      background-color: #60a3bc;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .create_btn:hover {
+      background-color: #3c7b98;
+    }
+    .highlighted {
+      background-color: #d4edda !important;
+    }
+    .invalid {
+      background-color: #f8d7da !important;
+    }
+    .edit-textarea {
+      width: 100%;
+      height: 80px;
+      font-size: 14px;
+      padding: 5px;
+      resize: vertical;
+    }
+  </style>
 </head>
 <body>
 
-<h1>مولد روابط رسائل واتساب</h1>
+<h1>مولد روابط واتساب - يدعم CSV و إرسال الكل</h1>
 
 <form>
-    <label>الرسالة:</label><br>
-    <textarea id="message" rows="3" placeholder="اكتب الرسالة مع {name}, {teacher}, {school}, {teacherNumber}"></textarea><br>
+  <label>الرسالة (استخدم {name}, {teacher}, {school}, {teacherNumber}):</label><br>
+  <textarea id="message" rows="3" placeholder="نص الرسالة..."></textarea><br>
 
-    <label>الأسماء (كل اسم في سطر):</label><br>
-    <textarea id="names" rows="3"></textarea><br>
+  <label>الأسماء (كل اسم في سطر):</label><br>
+  <textarea id="names" rows="3"></textarea><br>
 
-    <label>أرقام الهواتف (كل رقم في سطر):</label><br>
-    <textarea id="phones" rows="3"></textarea><br>
+  <label>أرقام الهواتف (كل رقم في سطر):</label><br>
+  <textarea id="phones" rows="3"></textarea><br>
 
-    <label>اسم المعلم:</label><br>
-    <input type="text" id="teacher"><br>
+  <label>أو ارفع ملف CSV:</label><br>
+  <input type="file" id="csvInput" accept=".csv"><br><br>
 
-    <label>رقم المعلم:</label><br>
-    <input type="text" id="teacherNumber"><br>
+  <label>اسم المعلم:</label><br>
+  <input type="text" id="teacher"><br>
 
-    <label>اسم المدرسة:</label><br>
-    <input type="text" id="school"><br>
+  <label>رقم المعلم:</label><br>
+  <input type="text" id="teacherNumber"><br>
 
-    <button type="button" class="create_btn" onclick="generateLinks()">إنشاء الروابط</button>
-    <button type="button" class="create_btn" onclick="copyLinks()">نسخ الروابط</button>
+  <label>اسم المدرسة:</label><br>
+  <input type="text" id="school"><br>
+
+  <button type="button" class="create_btn" onclick="generateLinks()">إنشاء الروابط</button>
+  <button type="button" class="create_btn" onclick="sendAll()">📤 إرسال الكل</button>
 </form>
 
 <table>
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>الرابط</th>
-            <th>الهاتف</th>
-            <th>فتح</th>
-        </tr>
-    </thead>
-    <tbody id="result"></tbody>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>فتح</th>
+      <th>الهاتف</th>
+      <th>نص الرسالة القابل للتعديل</th>
+    </tr>
+  </thead>
+  <tbody id="result"></tbody>
 </table>
 
 <script>
-function generateLinks() {
-    const msgTemplate = document.getElementById('message').value.trim();
-    const names = document.getElementById('names').value.trim().split('\n');
-    const phones = document.getElementById('phones').value.trim().split('\n');
-    const teacher = document.getElementById('teacher').value.trim();
-    const school = document.getElementById('school').value.trim();
-    const teacherNumber = document.getElementById('teacherNumber').value.trim();
-    const tbody = document.getElementById('result');
+let chatRows = [];
 
-    tbody.innerHTML = '';
+document.getElementById("csvInput").addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    phones.forEach((num, i) => {
-        const name = names[i] || '';
-        let msg = msgTemplate.replace('{name}', name)
-                             .replace('{teacher}', teacher)
-                             .replace('{school}', school)
-                             .replace('{teacherNumber}', teacherNumber);
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const lines = event.target.result.split("\n");
+    const names = [];
+    const phones = [];
 
-        const fullNum = num.trim().replace(/^0/, '');
-        const encodedMsg = encodeURIComponent(msg);
-        const waLink = `https://wa.me/972${fullNum}?text=${encodedMsg}`;
+    for (let i = 1; i < lines.length; i++) {
+      const [name, number] = lines[i].split(",");
+      if (name && number) {
+        names.push(name.trim());
+        phones.push(number.trim());
+      }
+    }
 
-        const row = tbody.insertRow();
-        row.insertCell(0).textContent = i + 1;
-        row.insertCell(1).textContent = waLink;
+    document.getElementById("names").value = names.join("\n");
+    document.getElementById("phones").value = phones.join("\n");
+  };
+  reader.readAsText(file);
+});
 
-        const phoneCell = row.insertCell(2);
-        const a = document.createElement('a');
-        a.href = waLink;
-        a.textContent = `972${fullNum}`;
-        phoneCell.appendChild(a);
-
-        const btnCell = row.insertCell(3);
-        const openBtn = document.createElement('button');
-        openBtn.textContent = 'فتح';
-        openBtn.className = 'create_btn';
-        openBtn.onclick = () => {
-            window.open(waLink, '_blank');
-            row.classList.add('highlighted');
-            setTimeout(() => {
-                row.parentNode.appendChild(row);
-            }, 150);
-        };
-        btnCell.appendChild(openBtn);
-    });
+function isValidPhone(number) {
+  return /^\d{9,15}$/.test(number); // 9 to 15 digits
 }
 
-function copyLinks() {
-    let all = '';
-    const rows = document.querySelectorAll('#result tr');
-    rows.forEach(row => {
-        const link = row.cells[1].textContent.trim();
-        all += link + '\n';
-    });
-    const temp = document.createElement('textarea');
-    temp.value = all;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand('copy');
-    document.body.removeChild(temp);
-    alert('تم نسخ الروابط');
+function generateLinks() {
+  const msgTemplate = document.getElementById('message').value.trim();
+  const names = document.getElementById('names').value.trim().split('\n').map(n => n.trim());
+  const phones = document.getElementById('phones').value.trim().split('\n');
+  const teacher = document.getElementById('teacher').value.trim();
+  const school = document.getElementById('school').value.trim();
+  const teacherNumber = document.getElementById('teacherNumber').value.trim();
+  const tbody = document.getElementById('result');
+
+  chatRows = [];
+
+  if (names.length !== phones.length) {
+    alert(`عدد الأسماء (${names.length}) لا يطابق عدد أرقام الهواتف (${phones.length})`);
+    return;
+  }
+
+  tbody.innerHTML = '';
+
+  phones.forEach((rawNum, i) => {
+    const number = rawNum.trim().replace(/^0/, '');
+    const name = names[i];
+    const fullNumber = `972${number}`;
+
+    const msg = msgTemplate
+      .replace('{name}', name)
+      .replace('{teacher}', teacher)
+      .replace('{school}', school)
+      .replace('{teacherNumber}', teacherNumber);
+
+    const row = tbody.insertRow();
+    const isValid = isValidPhone(number);
+
+    row.className = isValid ? '' : 'invalid';
+
+    row.insertCell(0).textContent = i + 1;
+
+    const btnCell = row.insertCell(1);
+    const btn = document.createElement('button');
+    btn.textContent = 'فتح';
+    btn.className = 'create_btn';
+    btn.onclick = () => {
+      if (!isValid) return;
+      const text = encodeURIComponent(textarea.value.trim());
+      const waLink = `https://wa.me/${fullNumber}?text=${text}`;
+      window.open(waLink, '_blank');
+      row.classList.add('highlighted');
+      setTimeout(() => row.parentNode.appendChild(row), 150);
+    };
+    btnCell.appendChild(btn);
+
+    row.insertCell(2).textContent = fullNumber;
+
+    const msgCell = row.insertCell(3);
+    const textarea = document.createElement('textarea');
+    textarea.className = 'edit-textarea';
+    textarea.value = msg;
+    msgCell.appendChild(textarea);
+
+    chatRows.push({ number: fullNumber, textarea, isValid, row });
+  });
+}
+
+function sendAll() {
+  let delay = 0;
+  const delayPer = 1000; // 1 second per message
+
+  chatRows.forEach((chat, i) => {
+    if (!chat.isValid) return;
+    const message = encodeURIComponent(chat.textarea.value.trim());
+    const url = `https://wa.me/${chat.number}?text=${message}`;
+    setTimeout(() => {
+      window.open(url, '_blank');
+      chat.row.classList.add('highlighted');
+      chat.row.parentNode.appendChild(chat.row);
+    }, delay);
+    delay += delayPer;
+  });
 }
 </script>
 
